@@ -88,47 +88,7 @@ export function GamePanel() {
     };
   }, []);
 
-  // Thêm grid background cho editor
-  function addGridBackground(app: any) {
-    const gridSize = 50;
-    const graphics = new window.PIXI.Graphics();
-    graphics.lineStyle(1, 0x333344, 0.5);
-    
-    // Vẽ lưới ngang
-    for (let y = 0; y < app.screen.height; y += gridSize) {
-      graphics.moveTo(0, y);
-      graphics.lineTo(app.screen.width, y);
-    }
-    
-    // Vẽ lưới dọc
-    for (let x = 0; x < app.screen.width; x += gridSize) {
-      graphics.moveTo(x, 0);
-      graphics.lineTo(x, app.screen.height);
-    }
-    
-    graphics.zIndex = -1;
-    app.stage.addChild(graphics);
-  }
 
-  // Sprite demo ban đầu
-  function addDemoSprite(app: any) {
-    const graphics = new window.PIXI.Graphics();
-    graphics.beginFill(0x4a9eff);
-    graphics.drawRoundedRect(100, 100, 120, 80, 8);
-    graphics.endFill();
-    graphics.interactive = true;
-    graphics.buttonMode = true;
-    
-    // Thêm sự kiện click để chọn trong inspector
-    graphics.on('click', () => handleObjectClick(graphics));
-
-    app.stage.addChild(graphics);
-
-    // Animation
-    app.ticker.add(() => {
-      graphics.rotation += 0.01;
-    });
-  }
 
   // Xử lý kéo thả
   function handleDragOver(e: DragEvent) {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AssetManager } from "../core/AssetManager.ts";
+// @ts-ignore - ignore warning import interface từ file TS sang JS
 import { Asset } from "../core/Asset.ts";
 
 // Cấu hình thư mục gốc assets - tương thích với cấu trúc TauriReactApp hiện có
