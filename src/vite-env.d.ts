@@ -1,24 +1,21 @@
-/// <reference types="vite/client" />
+﻿/// <reference types="vite/client" />
 
-// Định nghĩa global cho game editor
+declare module "codemirror";
+
 declare global {
   interface Window {
     PIXI: any;
+    CodeMirror: any;
+    dockview: any;
     gameEditor: {
       pixiApp: any;
       sceneManager: any;
       viewport: any;
+      emit: (event: string, data?: any) => void;
+      on: (event: string, callback: (data: any) => void) => void;
+      off: (event: string, callback: (data: any) => void) => void;
     };
   }
-}
-
-// Khởi tạo gameEditor nếu chưa tồn tại
-if (!window.gameEditor) {
-  window.gameEditor = {
-    pixiApp: null,
-    sceneManager: null,
-    viewport: null
-  };
 }
 
 export {};

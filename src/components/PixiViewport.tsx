@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 
 
 // Type definitions cho PixiJS Viewport
@@ -22,10 +22,10 @@ interface GameObject {
   pixiSprite: any;
 }
 
-// Viewport class để quản lý camera 2D
+// Viewport class Ä‘á»ƒ quáº£n lÃ½ camera 2D
 export class PixiViewport2D {
   private app: any; // PixiApplication
-  private container: any; // Container chính chứa tất cả game objects
+  private container: any; // Container chÃ­nh chá»©a táº¥t cáº£ game objects
   private state: ViewportState = {
     zoom: 1,
     position: { x: 0, y: 0 },
@@ -43,39 +43,39 @@ export class PixiViewport2D {
     this.container = new window.PIXI.Container();
     this.app.stage.addChild(this.container);
     
-    // Lưu ứng dụng vào window để truy cập từ các panel khác - fix: dùng pixiApp (tham số) thay vì app
+    // LÆ°u á»©ng dá»¥ng vÃ o window Ä‘á»ƒ truy cáº­p tá»« cÃ¡c panel khÃ¡c - fix: dÃ¹ng pixiApp (tham sá»‘) thay vÃ¬ app
     window.gameEditor.pixiApp = pixiApp;
     
     this.setupViewportEvents();
     this.setupZoomControls();
     this.addGridBackground();
-    console.log('✅ PixiViewport2D initialized with pan/zoom/grid support');
+    console.log('âœ… PixiViewport2D initialized with pan/zoom/grid support');
   }
 
-  // Thêm grid background giống editor chuyên nghiệp
+  // ThÃªm grid background giá»‘ng editor chuyÃªn nghiá»‡p
   private addGridBackground() {
     const gridContainer = new window.PIXI.Container();
-    const gridSize = 32; // Kích thước ô lưới
+    const gridSize = 32; // KÃ­ch thÆ°á»›c Ã´ lÆ°á»›i
     const canvasWidth = this.app.screen.width * 2;
     const canvasHeight = this.app.screen.height * 2;
     
-    // Tạo texture lưới
+    // Táº¡o texture lÆ°á»›i
     const gridCanvas = document.createElement('canvas');
     gridCanvas.width = gridSize * 2;
     gridCanvas.height = gridSize * 2;
     const ctx = gridCanvas.getContext('2d')!;
     
-    // Màu nền chính
+    // MÃ u ná»n chÃ­nh
     ctx.fillStyle = '#1a1a2e';
     ctx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
     
-    // Màu lưới
+    // MÃ u lÆ°á»›i
     ctx.strokeStyle = '#2d2d44';
     ctx.lineWidth = 1;
     ctx.strokeRect(0, 0, gridSize, gridSize);
     ctx.strokeRect(gridSize, gridSize, gridSize, gridSize);
     
-    const gridTexture = window.PIXI.Texture.fromCanvas(gridCanvas);
+    const gridTexture = window.PIXI.Texture.from(gridCanvas);
     gridTexture.wrapMode = window.PIXI.WRAP_MODES.REPEAT;
     
     const gridSprite = new window.PIXI.Sprite(gridTexture);
@@ -87,27 +87,27 @@ export class PixiViewport2D {
     this.container.addChildAt(gridSprite, 0);
   }
 
-  // Thiết lập các sự kiện kéo thả, zoom
+  // Thiáº¿t láº­p cÃ¡c sá»± kiá»‡n kÃ©o tháº£, zoom
   private setupViewportEvents() {
     const viewportElement = this.app.view;
     
-    // Mouse wheel để zoom
+    // Mouse wheel Ä‘á»ƒ zoom
     viewportElement.addEventListener('wheel', (e: WheelEvent) => {
       e.preventDefault();
       const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
       this.zoomAtPoint(e.offsetX, e.offsetY, zoomFactor);
     });
 
-    // Bắt đầu kéo (pan)
+    // Báº¯t Ä‘áº§u kÃ©o (pan)
     viewportElement.addEventListener('mousedown', (e: MouseEvent) => {
-      if (e.button === 1 || (e.button === 0 && e.altKey)) { // Chuột giữa hoặc Alt + chuột trái
+      if (e.button === 1 || (e.button === 0 && e.altKey)) { // Chuá»™t giá»¯a hoáº·c Alt + chuá»™t trÃ¡i
         this.state.isPanning = true;
         this.lastMousePos = { x: e.clientX, y: e.clientY };
         viewportElement.style.cursor = 'grabbing';
       }
     });
 
-    // Kéo trong quá trình di chuyển chuột
+    // KÃ©o trong quÃ¡ trÃ¬nh di chuyá»ƒn chuá»™t
     window.addEventListener('mousemove', (e: MouseEvent) => {
       if (this.state.isPanning) {
         const dx = e.clientX - this.lastMousePos.x;
@@ -117,7 +117,7 @@ export class PixiViewport2D {
       }
     });
 
-    // Kết thúc kéo
+    // Káº¿t thÃºc kÃ©o
     window.addEventListener('mouseup', () => {
       if (this.state.isPanning) {
         this.state.isPanning = false;
@@ -125,7 +125,7 @@ export class PixiViewport2D {
       }
     });
 
-    // Click chọn đối tượng
+    // Click chá»n Ä‘á»‘i tÆ°á»£ng
     viewportElement.addEventListener('click', (e: MouseEvent) => {
       if (!this.state.isPanning) {
         this.selectObjectAtScreenPos(e.offsetX, e.offsetY);
@@ -133,7 +133,7 @@ export class PixiViewport2D {
     });
   }
 
-  // Zoom tại vị trí con trỏ - public để gọi từ UI controls
+  // Zoom táº¡i vá»‹ trÃ­ con trá» - public Ä‘á»ƒ gá»i tá»« UI controls
   zoomAtPoint(screenX: number, screenY: number, factor: number) {
     const worldPos = this.screenToWorld(screenX, screenY);
     
@@ -148,7 +148,7 @@ export class PixiViewport2D {
     this.emitViewportChanged();
   }
 
-  // Kéo viewport
+  // KÃ©o viewport
   private pan(dx: number, dy: number) {
     this.state.position.x += dx;
     this.state.position.y += dy;
@@ -156,14 +156,14 @@ export class PixiViewport2D {
     this.emitViewportChanged();
   }
 
-  // Cập nhật vị trí và scale của container
+  // Cáº­p nháº­t vá»‹ trÃ­ vÃ  scale cá»§a container
   private updateContainerTransform() {
     this.container.x = this.state.position.x;
     this.container.y = this.state.position.y;
     this.container.scale.set(this.state.zoom);
   }
 
-  // Chuyển tọa độ màn hình sang tọa độ world
+  // Chuyá»ƒn tá»a Ä‘á»™ mÃ n hÃ¬nh sang tá»a Ä‘á»™ world
   screenToWorld(screenX: number, screenY: number) {
     return {
       x: (screenX - this.state.position.x) / this.state.zoom,
@@ -171,7 +171,7 @@ export class PixiViewport2D {
     };
   }
 
-  // Chuyển tọa độ world sang màn hình
+  // Chuyá»ƒn tá»a Ä‘á»™ world sang mÃ n hÃ¬nh
   worldToScreen(worldX: number, worldY: number) {
     return {
       x: worldX * this.state.zoom + this.state.position.x,
@@ -179,11 +179,11 @@ export class PixiViewport2D {
     };
   }
 
-  // Chọn đối tượng tại vị trí click
+  // Chá»n Ä‘á»‘i tÆ°á»£ng táº¡i vá»‹ trÃ­ click
   private selectObjectAtScreenPos(screenX: number, screenY: number) {
     const worldPos = this.screenToWorld(screenX, screenY);
     
-    // Tìm đối tượng dưới con trỏ
+    // TÃ¬m Ä‘á»‘i tÆ°á»£ng dÆ°á»›i con trá»
     for (const [id, obj] of this.gameObjects) {
       if (obj.pixiSprite && obj.pixiSprite.getBounds().contains(worldPos.x, worldPos.y)) {
         this.selectObject(id);
@@ -191,11 +191,11 @@ export class PixiViewport2D {
       }
     }
     
-    // Nếu không có đối tượng nào, bỏ chọn
+    // Náº¿u khÃ´ng cÃ³ Ä‘á»‘i tÆ°á»£ng nÃ o, bá» chá»n
     this.deselectObject();
   }
 
-  // Chọn đối tượng và hiển thị outline
+  // Chá»n Ä‘á»‘i tÆ°á»£ng vÃ  hiá»ƒn thá»‹ outline
   private selectObject(id: string) {
     const obj = this.gameObjects.get(id);
     if (!obj) return;
@@ -203,7 +203,7 @@ export class PixiViewport2D {
     this.deselectObject();
     this.selectedObjectId = id;
     
-    // Tạo outline xanh dương quanh đối tượng được chọn
+    // Táº¡o outline xanh dÆ°Æ¡ng quanh Ä‘á»‘i tÆ°á»£ng Ä‘Æ°á»£c chá»n
     if (obj.pixiSprite) {
       const bounds = obj.pixiSprite.getBounds();
       this.selectionOutline = new window.PIXI.Graphics();
@@ -212,11 +212,11 @@ export class PixiViewport2D {
       this.container.addChild(this.selectionOutline);
     }
     
-    // Phát sự kiện cho InspectorPanel
+    // PhÃ¡t sá»± kiá»‡n cho InspectorPanel
     window.dispatchEvent(new CustomEvent('objectSelected', { detail: obj }));
   }
 
-  // Bỏ chọn đối tượng
+  // Bá» chá»n Ä‘á»‘i tÆ°á»£ng
   private deselectObject() {
     if (this.selectionOutline) {
       this.container.removeChild(this.selectionOutline);
@@ -225,7 +225,7 @@ export class PixiViewport2D {
     this.selectedObjectId = null;
   }
 
-  // Thêm đối tượng game vào viewport
+  // ThÃªm Ä‘á»‘i tÆ°á»£ng game vÃ o viewport
   addGameObject(obj: GameObject) {
     if (obj.pixiSprite) {
       this.container.addChild(obj.pixiSprite);
@@ -233,7 +233,7 @@ export class PixiViewport2D {
     }
   }
 
-  // Xóa đối tượng khỏi viewport
+  // XÃ³a Ä‘á»‘i tÆ°á»£ng khá»i viewport
   removeGameObject(id: string) {
     const obj = this.gameObjects.get(id);
     if (obj && obj.pixiSprite) {
@@ -245,12 +245,12 @@ export class PixiViewport2D {
     }
   }
 
-  // Thiết lập các nút điều khiển zoom
+  // Thiáº¿t láº­p cÃ¡c nÃºt Ä‘iá»u khiá»ƒn zoom
   private setupZoomControls() {
-    // Bạn có thể thêm UI control: nút +, -, reset zoom
+    // Báº¡n cÃ³ thá»ƒ thÃªm UI control: nÃºt +, -, reset zoom
   }
 
-  // Phát sự kiện khi viewport thay đổi
+  // PhÃ¡t sá»± kiá»‡n khi viewport thay Ä‘á»•i
   private emitViewportChanged() {
     window.dispatchEvent(new CustomEvent('viewportChanged', { 
       detail: { 
@@ -260,19 +260,19 @@ export class PixiViewport2D {
     }));
   }
 
-  // Reset viewport về vị trí ban đầu - public để gọi từ UI controls
+  // Reset viewport vá» vá»‹ trÃ­ ban Ä‘áº§u - public Ä‘á»ƒ gá»i tá»« UI controls
   reset() {
     this.state.zoom = 1;
     this.state.position = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
     this.updateContainerTransform();
   }
 
-  // Lấy trạng thái hiện tại
+  // Láº¥y tráº¡ng thÃ¡i hiá»‡n táº¡i
   getState() { return { ...this.state }; }
   getContainer() { return this.container; }
 }
 
-// React component để tích hợp vào GamePanel
+// React component Ä‘á»ƒ tÃ­ch há»£p vÃ o GamePanel
 export function PixiViewportComponent({ pixiApp }: { pixiApp: any }) {
   const viewportRef = useRef<PixiViewport2D | null>(null);
 
@@ -280,7 +280,7 @@ export function PixiViewportComponent({ pixiApp }: { pixiApp: any }) {
     if (pixiApp && !viewportRef.current) {
       viewportRef.current = new PixiViewport2D(pixiApp);
       
-      // Thêm các đối tượng demo vào viewport
+      // ThÃªm cÃ¡c Ä‘á»‘i tÆ°á»£ng demo vÃ o viewport
       const demoSprite = new window.PIXI.Sprite(window.PIXI.Texture.from('https://picsum.photos/128/128'));
       demoSprite.position.set(-64, -64);
       
@@ -300,10 +300,10 @@ export function PixiViewportComponent({ pixiApp }: { pixiApp: any }) {
     };
   }, [pixiApp]);
 
-  return null; // Component ẩn, chỉ chạy logic PixiJS
+  return null; // Component áº©n, chá»‰ cháº¡y logic PixiJS
 }
 
-// Component UI điều khiển viewport
+// Component UI Ä‘iá»u khiá»ƒn viewport
 export function ViewportControls({ viewport }: { viewport: PixiViewport2D | null }) {
   const [zoom, setZoom] = useState(100);
 
@@ -323,23 +323,25 @@ export function ViewportControls({ viewport }: { viewport: PixiViewport2D | null
   };
 
   return (
-    <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-gray-800/90 backdrop-blur p-2 rounded-lg shadow-lg">
+    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-gray-900/90 backdrop-blur border border-gray-800 p-1.5 rounded-lg shadow-lg z-10 text-xs">
       <button 
         onClick={handleZoomOut} 
-        className="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 rounded text-white font-bold"
+        className="w-6 h-6 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded text-white font-bold"
         title="Zoom out"
-      >−</button>
-      <span className="text-white text-sm w-12 text-center">{zoom}%</span>
+      >-</button>
+      <span className="text-white text-xs w-10 text-center font-mono">{zoom}%</span>
       <button 
         onClick={handleZoomIn} 
-        className="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 rounded text-white font-bold"
+        className="w-6 h-6 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded text-white font-bold"
         title="Zoom in"
       >+</button>
       <button 
         onClick={handleReset} 
-        className="px-3 h-8 bg-blue-600 hover:bg-blue-500 rounded text-white text-sm"
+        className="px-2 h-6 bg-blue-600 hover:bg-blue-500 rounded text-white text-[11px]"
         title="Reset view"
       >Reset</button>
     </div>
   );
 }
+
+

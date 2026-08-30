@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { AssetManager } from '../../core/AssetManager';
 import { SceneManager } from '../../core/SceneManager';
 import { RectObject, CircleObject } from '../../core/GameObject';
@@ -10,16 +10,16 @@ export function GamePanel() {
   const viewportRef = useRef<PixiViewport2D | null>(null);
   const [currentTool, setCurrentTool] = useState<string>('select');
 
-  // 🎯 Hàm thêm demo sprite vào viewport - định nghĩa TRƯỚC useEffect để fix hoisting (lỗi "addDemoSpriteToViewport is not defined")
   function addDemoSpriteToViewport(viewport: PixiViewport2D) {
+    if (!window.PIXI) return;
     const graphics = new window.PIXI.Graphics();
-    graphics.beginFill(0x4a9eff);
+    graphics.beginFill(0x3b82f6);
     graphics.drawRoundedRect(0, 0, 120, 80, 8);
     graphics.endFill();
-    graphics.x = -60; // Căn giữa tại (0,0)
+    graphics.x = -60;
     graphics.y = -40;
-    graphics.interactive = true;
-    graphics.buttonMode = true;
+    graphics.eventMode = 'static';
+    graphics.cursor = 'pointer';
 
     viewport.addGameObject({
       id: 'demo_rect_001',
@@ -33,13 +33,12 @@ export function GamePanel() {
   }
 
   useEffect(() => {
-    if (!canvasRef.current || pixiAppRef.current) return;
+    if (!canvasRef.current || pixiAppRef.current || !window.PIXI) return;
 
-    // Khởi tạo PixiJS App
     const app = new window.PIXI.Application({
       width: 800,
       height: 600,
-      backgroundColor: 0x1a1a2e,
+      backgroundColor: 0x0b0f19,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true
@@ -47,33 +46,28 @@ export function GamePanel() {
 
     canvasRef.current.appendChild(app.view as HTMLCanvasElement);
     pixiAppRef.current = app;
-
-    // Lưu ứng dụng vào window để truy cập từ các panel khác
     window.gameEditor.pixiApp = app;
     
-    // 🌟 KHỞI TẠO VIEWPORT 2D chuyên nghiệp (thay thế grid cũ)
     const viewport = new PixiViewport2D(app);
     viewportRef.current = viewport;
     window.gameEditor.viewport = viewport;
     
-    // Khởi tạo SceneManager
     const sceneManager = SceneManager.getInstance();
     sceneManager.init(app);
     window.gameEditor.sceneManager = sceneManager;
     
-    // Thêm demo rectangle vào viewport (thay thế addDemoSprite cũ)
     addDemoSpriteToViewport(viewport);
 
-    // Lắng nghe sự kiện drop từ AssetsPanel
     const element = canvasRef.current;
     element.addEventListener('dragover', handleDragOver);
     element.addEventListener('drop', handleDrop);
 
-    // Handle window resize
     const handleResize = () => {
       if (canvasRef.current && app.view instanceof HTMLCanvasElement) {
         const rect = canvasRef.current.getBoundingClientRect();
-        app.renderer.resize(rect.width, rect.height);
+        if (rect.width > 0 && rect.height > 0) {
+          app.renderer.resize(rect.width, rect.height);
+        }
       }
     };
     
@@ -88,36 +82,28 @@ export function GamePanel() {
     };
   }, []);
 
-
-
-  // Xử lý kéo thả
   function handleDragOver(e: DragEvent) {
     e.preventDefault();
-    e.dataTransfer!.dropEffect = 'copy';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
   }
 
-  // Xử lý chọn đối tượng khi click
   function handleObjectClick(object: any) {
-    // Bỏ chọn đối tượng cũ (xóa outline nếu có)
-    if (pixiAppRef.current?.selectedObject) {
-      // Logic xóa outline cũ
-    }
-    
-    // Thêm outline cho đối tượng mới để hiển thị đang được chọn
     if (object) {
       pixiAppRef.current.selectedObject = object;
-      // Phát sự kiện chọn đối tượng cho InspectorPanel
       (window as any).gameEditor?.emit('objectSelected', object);
     }
   }
 
-  // Xử lý khi drop asset vào game view
   async function handleDrop(e: DragEvent) {
     e.preventDefault();
-    const assetId = e.dataTransfer!.getData('assetId');
-    const assetType = e.dataTransfer!.getData('assetType');
+    if (!e.dataTransfer || !pixiAppRef.current) return;
+
+    const assetId = e.dataTransfer.getData('assetId');
+    const assetType = e.dataTransfer.getData('assetType');
     
-    if (!assetId || !pixiAppRef.current) return;
+    if (!assetId) return;
 
     const app = pixiAppRef.current;
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -126,86 +112,67 @@ export function GamePanel() {
 
     try {
       const assetManager = AssetManager.getInstance();
-      
-      // Nếu là image thì tạo sprite
       if (assetType === 'image') {
         const sprite = await assetManager.createSpriteFromAsset(assetId);
         sprite.x = x;
         sprite.y = y;
-        sprite.interactive = true;
-        sprite.buttonMode = true;
-        
-        // Thêm sự kiện click để chọn đối tượng
-        sprite.on('click', () => handleObjectClick(sprite));
+        sprite.eventMode = 'static';
+        sprite.cursor = 'pointer';
+        sprite.on('pointerdown', () => handleObjectClick(sprite));
 
         app.stage.addChild(sprite);
         console.log(`[GamePanel] Added sprite at (${x}, ${y}):`, assetId);
-      }
-      // Các loại khác có thể xử lý tương tự (spine, model 3D...)
-      else if (assetType === 'spine') {
-        // Spine animation sẽ được thêm ở đây
-        console.log('[GamePanel] Spine asset dropped:', assetId);
-      } 
-      else if (assetType === 'gltf') {
-        // GLTF model sẽ được thêm ở đây
-        console.log('[GamePanel] 3D model dropped:', assetId);
       }
     } catch (error) {
       console.error('[GamePanel] Error loading asset:', error);
     }
   }
   
-  // Tạo hình chữ nhật mới bằng GameObject
   const createRectangle = () => {
     const sceneManager = SceneManager.getInstance();
-    const rect = new RectObject('Rectangle_' + Date.now(), 120, 80, 0x4a9eff);
+    const rect = new RectObject('Rectangle_' + Date.now(), 120, 80, 0x3b82f6);
     rect.position = { 
-      x: 100 + Math.random() * 300, 
-      y: 100 + Math.random() * 200 
+      x: 100 + Math.random() * 200, 
+      y: 100 + Math.random() * 150 
     };
     
-    // Bật tương tác để click chọn
-    rect.pixiObject.interactive = true;
-    rect.pixiObject.buttonMode = true;
-    rect.pixiObject.on('click', () => {
+    rect.pixiObject.eventMode = 'static';
+    rect.pixiObject.cursor = 'pointer';
+    rect.pixiObject.on('pointerdown', () => {
       sceneManager.setSelectedObject(rect);
     });
     
     sceneManager.addObject(rect);
   };
 
-  // Tạo hình tròn mới bằng GameObject
   const createCircle = () => {
     const sceneManager = SceneManager.getInstance();
-    const circle = new CircleObject('Circle_' + Date.now(), 50, 0xff6b6b);
+    const circle = new CircleObject('Circle_' + Date.now(), 40, 0xef4444);
     circle.position = { 
-      x: 100 + Math.random() * 300, 
-      y: 100 + Math.random() * 200 
+      x: 100 + Math.random() * 200, 
+      y: 100 + Math.random() * 150 
     };
     
-    // Bật tương tác để click chọn
-    circle.pixiObject.interactive = true;
-    circle.pixiObject.buttonMode = true;
-    circle.pixiObject.on('click', () => {
+    circle.pixiObject.eventMode = 'static';
+    circle.pixiObject.cursor = 'pointer';
+    circle.pixiObject.on('pointerdown', () => {
       sceneManager.setSelectedObject(circle);
     });
     
     sceneManager.addObject(circle);
   };
 
-  // Tạo đường thẳng mới bằng RectObject (đơn giản hóa)
   const createLine = () => {
     const sceneManager = SceneManager.getInstance();
-    const lineRect = new RectObject('Line_' + Date.now(), 150, 3, 0x4ade80);
+    const lineRect = new RectObject('Line_' + Date.now(), 150, 4, 0x10b981);
     lineRect.position = { 
-      x: 100 + Math.random() * 300, 
-      y: 100 + Math.random() * 200 
+      x: 100 + Math.random() * 200, 
+      y: 100 + Math.random() * 150 
     };
     
-    // Bật tương tác để click chọn
-    lineRect.pixiObject.interactive = true;
-    lineRect.pixiObject.buttonMode = true;
-    lineRect.pixiObject.on('click', () => {
+    lineRect.pixiObject.eventMode = 'static';
+    lineRect.pixiObject.cursor = 'pointer';
+    lineRect.pixiObject.on('pointerdown', () => {
       sceneManager.setSelectedObject(lineRect);
     });
     
@@ -213,72 +180,71 @@ export function GamePanel() {
   };
 
   return (
-    <div id="game-canvas-container" className="w-full h-full flex flex-col bg-gray-950 overflow-hidden">
-      {/* Toolbar game view với công cụ tạo đối tượng 2D */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-gray-900 border-b border-gray-800 flex-wrap">
+    <div id="game-canvas-container" className="w-full h-full flex flex-col bg-gray-950 overflow-hidden relative">
+      {/* Toolbar game view */}
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 border-b border-gray-800 shrink-0 z-10">
         <button 
           onClick={() => setCurrentTool('select')}
-          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${currentTool === 'select' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'}`}
+          className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${currentTool === 'select' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
         >
           🖐️ Chọn
         </button>
-        <div className="w-px h-6 bg-gray-600"></div>
-        {/* Công cụ vẽ 2D cơ bản */}
+        <div className="w-px h-5 bg-gray-700"></div>
+        
         <button 
           onClick={createRectangle}
-          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-medium transition-colors"
+          className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs font-medium transition-colors"
           title="Thêm hình chữ nhật"
         >
           ▭ HCN
         </button>
         <button 
           onClick={createCircle}
-          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-medium transition-colors"
+          className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs font-medium transition-colors"
           title="Thêm hình tròn"
         >
           ● Tròn
         </button>
         <button 
           onClick={createLine}
-          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs font-medium transition-colors"
+          className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs font-medium transition-colors"
           title="Thêm đường thẳng"
         >
           ➖ Đường
         </button>
-        <div className="w-px h-6 bg-gray-600"></div>
-        <button className="px-3 py-1 bg-green-600 hover:bg-green-500 rounded text-xs font-medium transition-colors">
+        <div className="w-px h-5 bg-gray-700"></div>
+        <button 
+          onClick={() => window.gameEditor?.pixiApp?.start()}
+          className="px-2.5 py-1 bg-green-600 hover:bg-green-500 text-white rounded text-xs font-medium transition-colors"
+        >
           ▶ Chạy
         </button>
-        <button className="px-3 py-1 bg-red-600 hover:bg-red-500 rounded text-xs font-medium transition-colors">
+        <button 
+          onClick={() => window.gameEditor?.pixiApp?.stop()}
+          className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-medium transition-colors"
+        >
           ⏹ Dừng
         </button>
         <div className="flex-1"></div>
-        <span className="text-xs text-gray-500">800 × 600</span>
-        <select className="px-2 py-1 bg-gray-800 border border-gray-700 rounded text-xs text-gray-300">
-          <option>100%</option>
-          <option>75%</option>
-          <option>50%</option>
-          <option>25%</option>
-        </select>
+        <span className="text-xs text-gray-400">800 × 600</span>
       </div>
       
       {/* Canvas container */}
       <div 
         ref={canvasRef} 
-        className="flex-1 overflow-hidden relative"
-        style={{ minHeight: '400px' }}
-      >
-        {/* PixiJS canvas sẽ được thêm vào đây */}
-      </div>
+        className="flex-1 w-full h-full overflow-hidden relative"
+      />
       
-      {/* 🔍 Control panel zoom của Viewport */}
+      {/* Viewport Zoom Controls */}
       <ViewportControls viewport={viewportRef.current} />
       
-      {/* 📝 Hướng dẫn sử dụng */}
-      <div className="absolute bottom-4 right-4 bg-gray-800/80 backdrop-blur px-3 py-2 rounded text-xs text-gray-400">
-        <p>Scroll: Zoom | Alt+Drag: Pan | Click: Select</p>
+      {/* Hints */}
+      <div className="absolute bottom-2 right-2 bg-gray-900/90 backdrop-blur border border-gray-800 px-2.5 py-1 rounded-lg text-[11px] text-gray-400 select-none z-10 pointer-events-none">
+        <span>Scroll: Zoom | Alt+Drag: Pan | Click: Select</span>
       </div>
     </div>
-  );}
+  );
+}
 
 export default GamePanel;
+

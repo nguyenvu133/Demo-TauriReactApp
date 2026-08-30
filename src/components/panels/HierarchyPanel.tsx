@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 
 interface SceneObject {
   id: string;
@@ -36,7 +36,7 @@ export function HierarchyPanel() {
 
   useEffect(() => {
     // Lắng nghe sự kiện thêm object mới từ gameEditor
-    window.gameEditor.on('objectAdded', (newObject: any) => {
+    window.gameEditor?.on('objectAdded', (newObject: any) => {
       setSceneObjects(prev => {
         const root = { ...prev[0] };
         root.children = [...root.children, {
@@ -50,7 +50,7 @@ export function HierarchyPanel() {
     });
 
     // Lắng nghe sự kiện xóa object
-    window.gameEditor.on('objectRemoved', (objectId: string) => {
+    window.gameEditor?.on('objectRemoved', (objectId: string) => {
       setSceneObjects(prev => {
         const root = { ...prev[0] };
         root.children = root.children.filter(c => c.id !== objectId);
@@ -76,8 +76,7 @@ export function HierarchyPanel() {
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
-    // Phát sự kiện chọn object để Inspector cập nhật
-    window.gameEditor.emit('objectSelected', id);
+    window.gameEditor?.emit('objectSelected', id);
   };
 
   const renderTreeItem = (obj: SceneObject, depth: number = 0) => {
@@ -87,22 +86,22 @@ export function HierarchyPanel() {
     return (
       <div key={obj.id}>
         <div
-          className={`flex items-center gap-1 px-2 py-1 cursor-pointer hover:bg-gray-700 ${isSelected ? 'bg-blue-600' : ''}`}
-          style={{ paddingLeft: `${depth * 16 + 8}px` }}
+          className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer rounded transition-colors ${isSelected ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}
+          style={{ paddingLeft: `${depth * 14 + 8}px` }}
           onClick={() => handleSelect(obj.id)}
         >
           {hasChildren ? (
             <button 
               onClick={(e) => { e.stopPropagation(); toggleExpand(obj.id); }}
-              className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-white"
+              className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-white text-xs"
             >
               {obj.isExpanded ? '▼' : '▶'}
             </button>
           ) : (
             <span className="w-4"></span>
           )}
-          <span className="text-xs">{getObjectIcon(obj.type)}</span>
-          <span className="text-sm text-gray-200 ml-1">{obj.name}</span>
+          <span className="text-sm">{getObjectIcon(obj.type)}</span>
+          <span className="text-xs font-medium ml-1 truncate">{obj.name}</span>
         </div>
         {hasChildren && obj.isExpanded && obj.children.map(child => renderTreeItem(child, depth + 1))}
       </div>
@@ -121,16 +120,18 @@ export function HierarchyPanel() {
   };
 
   return (
-    <div className="w-full h-full bg-gray-900 text-white overflow-auto">
-      <div className="p-2 border-b border-gray-700 flex items-center justify-between">
-        <span className="text-sm font-medium">Hierarchy</span>
-        <button className="w-6 h-6 flex items-center justify-center hover:bg-gray-700 rounded text-xs" title="Create Empty">
+    <div className="w-full h-full bg-gray-950 text-white overflow-auto flex flex-col">
+      <div className="p-2 border-b border-gray-800 bg-gray-900 flex items-center justify-between shrink-0">
+        <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Hierarchy</span>
+        <button className="w-6 h-6 flex items-center justify-center hover:bg-gray-800 rounded text-xs text-gray-300" title="Create Empty">
           ➕
         </button>
       </div>
-      <div className="py-1">
+      <div className="py-1 px-1 flex-1 overflow-y-auto">
         {sceneObjects.map(obj => renderTreeItem(obj))}
       </div>
     </div>
   );
 }
+
+export default HierarchyPanel;

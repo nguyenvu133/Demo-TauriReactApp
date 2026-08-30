@@ -1,48 +1,58 @@
-/* Reset và base styles cho editor */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+﻿@import "tailwindcss";
 
+/* Base editor styles */
 html, body, #root {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #030712;
+  color: #f3f4f6;
 }
 
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --border-color: #475569;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --bg-primary: #030712;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --border-color: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
   --accent-blue: #3b82f6;
-  --accent-green: #22c55e;
+  --accent-green: #10b981;
   --accent-red: #ef4444;
-  --accent-yellow: #eab308;
+  --accent-yellow: #f59e0b;
 }
 
 /* Dockview theme customization */
 .dockview-theme-dark {
-  --dv-background: var(--bg-primary);
-  --dv-panel-background: var(--bg-secondary);
-  --dv-border-color: var(--border-color);
-  --dv-tabs-background: var(--bg-secondary);
-  --dv-separator-border: var(--border-color);
-  --dv-active-tab-background: var(--bg-tertiary);
-  --dv-title-color: var(--text-primary);
+  --dv-background-color: #030712;
+  --dv-paneview-active-outline-color: #3b82f6;
+  --dv-tabs-and-actions-container-background-color: #111827;
+  --dv-activegroup-visiblepanel-tab-background-color: #1f2937;
+  --dv-activegroup-hiddenpanel-tab-background-color: #111827;
+  --dv-inactivegroup-visiblepanel-tab-background-color: #111827;
+  --dv-inactivegroup-hiddenpanel-tab-background-color: #0f172a;
+  --dv-tab-divider-color: #374151;
+  --dv-activegroup-visiblepanel-tab-color: #f9fafb;
+  --dv-activegroup-hiddenpanel-tab-color: #9ca3af;
+  --dv-inactivegroup-visiblepanel-tab-color: #d1d5db;
+  --dv-inactivegroup-hiddenpanel-tab-color: #6b7280;
+  --dv-separator-border: #1f2937;
+  --dv-drag-over-background-color: rgba(59, 130, 246, 0.2);
+  --dv-drag-over-border-color: #3b82f6;
+  width: 100%;
+  height: 100%;
 }
 
-/* Canvas trong GamePanel */
+/* Canvas container */
 #game-canvas-container {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: #1a1a2e;
+  background: #0b0f19;
 }
 
 #game-canvas-container canvas {
@@ -51,149 +61,21 @@ html, body, #root {
   height: 100%;
 }
 
-/* Scrollbar styling cho các panel */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: #111827;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
+  background: #374151;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.fade-in {
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-/* Tooltip styling */
-[title] {
-  position: relative;
-}
-
-/* Status bar styles */
-.status-bar {
-  background: linear-gradient(90deg, var(--accent-blue), #1d4ed8);
-}
-
-/* PixiJS MVP Demo Styles */
-body {
-  margin: 0;
-  padding: 0;
-  background: #1a1a2e;
-}
-
-#pixi-mvp-demo {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 3px solid #00d4ff;
-  border-radius: 8px;
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-  z-index: 50;
-}
-
-.demo-info {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  z-index: 100;
-}
-
-.demo-info h1 {
-  color: #00d4ff;
-  margin: 0 0 10px 0;
-  font-size: 24px;
-}
-
-.demo-info p {
-  margin: 5px 0;
-  color: #aaa;
-}
-
-a {
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
+  background: #4b5563;
 }

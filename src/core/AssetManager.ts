@@ -1,14 +1,14 @@
-import { Asset, AssetType, AssetStatus } from './Asset';
+﻿import { Asset, AssetType, AssetStatus } from './Asset';
 
 export class AssetManager {
   private static instance: AssetManager;
   private assets: Map<string, Asset> = new Map();
   private folders: Map<string, string[]> = new Map(); // folder path -> array of asset IDs
-  private loadedTextures: Map<string, any> = new Map(); // Lưu textures đã load cho PixiJS
+  private loadedTextures: Map<string, any> = new Map(); // LÆ°u textures Ä‘Ã£ load cho PixiJS
   private eventListeners: Map<string, Function[]> = new Map();
 
   private constructor() {
-    // Khởi tạo asset mặc định cho demo
+    // Khá»Ÿi táº¡o asset máº·c Ä‘á»‹nh cho demo
     this.setupDemoAssets();
   }
 
@@ -20,7 +20,7 @@ export class AssetManager {
     return AssetManager.instance;
   }
 
-  // Thiết lập các assets demo
+  // Thiáº¿t láº­p cÃ¡c assets demo
   private setupDemoAssets() {
     const demoAssets: Omit<Asset, 'id'>[] = [
       {
@@ -95,17 +95,17 @@ export class AssetManager {
       }
     ];
 
-    // Thêm vào quản lý
+    // ThÃªm vÃ o quáº£n lÃ½
     demoAssets.forEach(asset => this.addAsset(asset));
   }
 
-  // Thêm asset mới
+  // ThÃªm asset má»›i
   public addAsset(asset: Omit<Asset, 'id'>): string {
     const id = `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const newAsset: Asset = { ...asset, id };
     this.assets.set(id, newAsset);
 
-    // Thêm vào thư mục tương ứng
+    // ThÃªm vÃ o thÆ° má»¥c tÆ°Æ¡ng á»©ng
     const folderPath = asset.path.substring(0, asset.path.lastIndexOf('/')) || '/';
     if (!this.folders.has(folderPath)) {
       this.folders.set(folderPath, []);
@@ -117,12 +117,12 @@ export class AssetManager {
     return id;
   }
 
-  // Xóa asset
+  // XÃ³a asset
   public removeAsset(id: string): boolean {
     const asset = this.assets.get(id);
     if (!asset) return false;
 
-    // Xóa khỏi folder
+    // XÃ³a khá»i folder
     const folderPath = asset.path.substring(0, asset.path.lastIndexOf('/')) || '/';
     const folderAssets = this.folders.get(folderPath);
     if (folderAssets) {
@@ -130,7 +130,7 @@ export class AssetManager {
       if (index > -1) folderAssets.splice(index, 1);
     }
 
-    // Xóa texture nếu có
+    // XÃ³a texture náº¿u cÃ³
     if (this.loadedTextures.has(id)) {
       const texture = this.loadedTextures.get(id);
       texture?.destroy?.();
@@ -142,32 +142,32 @@ export class AssetManager {
     return true;
   }
 
-  // Lấy asset theo ID
+  // Láº¥y asset theo ID
   public getAsset(id: string): Asset | undefined {
     return this.assets.get(id);
   }
 
-  // Lấy tất cả assets
+  // Láº¥y táº¥t cáº£ assets
   public getAllAssets(): Asset[] {
     return Array.from(this.assets.values());
   }
 
-  // Lấy assets theo loại
+  // Láº¥y assets theo loáº¡i
   public getAssetsByType(type: AssetType): Asset[] {
     return Array.from(this.assets.values()).filter(a => a.type === type);
   }
 
-  // Load asset vào PixiJS (cho texture)
+  // Load asset vÃ o PixiJS (cho texture)
   public async loadAssetForPixi(assetId: string): Promise<any> {
     const asset = this.assets.get(assetId);
     if (!asset) throw new Error(`Asset ${assetId} not found`);
 
-    // Nếu đã load rồi thì trả về luôn
+    // Náº¿u Ä‘Ã£ load rá»“i thÃ¬ tráº£ vá» luÃ´n
     if (this.loadedTextures.has(assetId)) {
       return this.loadedTextures.get(assetId);
     }
 
-    // Chỉ hỗ trợ load image cho PixiJS trong phiên bản này
+    // Chá»‰ há»— trá»£ load image cho PixiJS trong phiÃªn báº£n nÃ y
     if (asset.type !== AssetType.IMAGE) {
       throw new Error(`Cannot load ${asset.type} asset into PixiJS`);
     }
@@ -176,8 +176,8 @@ export class AssetManager {
       asset.status = AssetStatus.LOADING;
       this.emit('assetLoading', assetId);
 
-      // Tạo texture từ URL
-      const texture = await window.PIXI.Texture.fromURL(asset.path);
+      // Táº¡o texture tá»« URL
+      const texture = window.PIXI.Assets ? await window.PIXI.Assets.load(asset.path).catch(() => window.PIXI.Texture.from(asset.path)) : window.PIXI.Texture.from(asset.path);
       this.loadedTextures.set(assetId, texture);
       
       asset.status = AssetStatus.LOADED;
@@ -190,7 +190,7 @@ export class AssetManager {
     }
   }
 
-  // Tạo sprite từ asset
+  // Táº¡o sprite tá»« asset
   public async createSpriteFromAsset(assetId: string) {
     const texture = await this.loadAssetForPixi(assetId);
     return new window.PIXI.Sprite(texture);
@@ -219,9 +219,9 @@ export class AssetManager {
     }
   }
 
-  // Import assets từ thư mục
+  // Import assets tá»« thÆ° má»¥c
   public async scanFolder(path: string): Promise<Asset[]> {
-    // Trong môi trường thực, đây sẽ gọi Tauri API để quét thư mục
+    // Trong mÃ´i trÆ°á»ng thá»±c, Ä‘Ã¢y sáº½ gá»i Tauri API Ä‘á»ƒ quÃ©t thÆ° má»¥c
     console.log(`[AssetManager] Scanning folder: ${path}`);
     return [];
   }

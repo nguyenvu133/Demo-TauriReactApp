@@ -1,5 +1,6 @@
-import { defineConfig } from "vite";
+﻿import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 
 // @ts-expect-error process is a nodejs global
@@ -7,11 +8,10 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-  // Cấu hình cơ bản
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   
-  // Đường dẫn absolute để import dễ dàng
   resolve: {
+    extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
     alias: {
       "@": resolve(__dirname, "./src"),
       "@components": resolve(__dirname, "./src/components"),
@@ -20,12 +20,10 @@ export default defineConfig(async () => ({
     },
   },
   
-  // Build options tối ưu cho PixiJS
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: true, // Dễ debug khi phát triển
-    // Tối ưu bundle size
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -37,15 +35,12 @@ export default defineConfig(async () => ({
     },
   },
   
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   clearScreen: false,
   server: {
     port: 1420,
     strictPort: true,
     host: host || "0.0.0.0",
-    // Hỗ trợ CORS để load assets local
     cors: true,
-    // Hot module replacement cho development
     hmr: host
       ? {
           protocol: "ws",
@@ -60,7 +55,6 @@ export default defineConfig(async () => ({
     },
   },
   
-  // Tối ưu cho PixiJS (tăng hiệu suất)
   optimizeDeps: {
     include: ["pixi.js", "dockview", "react", "react-dom"],
   },
