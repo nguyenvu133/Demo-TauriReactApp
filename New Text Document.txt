@@ -1,0 +1,8 @@
+Giao diện dockable (kéo thả panel) với dockview
+Quản lý assets (hình ảnh, âm thanh, tilemap, spine, gltf...)
+Inspector để chỉnh sửa thuộc tính của các đối tượng
+Hierarchy panel để quản lý cảnh (scene)
+Hỗ trợ cả 2D (PixiJS) và 3D (ThreeJS)
+Hệ thống component cho game objects
+Scripting support
+Build & xuất game
