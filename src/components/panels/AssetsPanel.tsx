@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Asset, AssetIcons, AssetColors } from '../../core/Asset';
 // @ts-ignore: JS module without TypeScript declarations
-import { useAssetBrowserModel } from '../../hooks/useAssetBrowserModel.js';
+import { useAssetBrowserModel } from '../../hooks/useAssetBrowserModel';
 
 // View modes cho panel assets
 type ViewMode = 'grid' | 'list' | 'detail';

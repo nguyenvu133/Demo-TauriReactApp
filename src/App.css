@@ -89,6 +89,48 @@ html, body, #root {
 .status-bar {
   background: linear-gradient(90deg, var(--accent-blue), #1d4ed8);
 }
+
+/* PixiJS MVP Demo Styles */
+body {
+  margin: 0;
+  padding: 0;
+  background: #1a1a2e;
+}
+
+#pixi-mvp-demo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid #00d4ff;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+  z-index: 50;
+}
+
+.demo-info {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  z-index: 100;
+}
+
+.demo-info h1 {
+  color: #00d4ff;
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.demo-info p {
+  margin: 5px 0;
+  color: #aaa;
+}
+
+a {
   color: #646cff;
   text-decoration: inherit;
 }
